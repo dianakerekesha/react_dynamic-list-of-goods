@@ -6,14 +6,22 @@ import * as goodsAPI from './api/goods';
 
 export const App: React.FC = () => {
   const [goods, setGoods] = useState<Good[]>([]);
+  const [hasError, setHasError] = useState(false);
 
-  const loadAll = () => goodsAPI.getAll().then(setGoods);
-  const load5First = () => goodsAPI.get5First().then(setGoods);
-  const loadRed = () => goodsAPI.getRedGoods().then(setGoods);
+  const handleLoad = (promise: Promise<Good[]>) => {
+    setHasError(false);
+    promise.then(setGoods).catch(() => setHasError(true));
+  };
+
+  const loadAll = () => handleLoad(goodsAPI.getAll());
+  const load5First = () => handleLoad(goodsAPI.get5First());
+  const loadRed = () => handleLoad(goodsAPI.getRedGoods());
 
   return (
     <div className="App">
       <h1>Dynamic list of Goods</h1>
+
+      {hasError && <p style={{ color: 'red' }}>Something went wrong</p>}
 
       <button type="button" data-cy="all-button" onClick={loadAll}>
         Load all goods
